@@ -1,0 +1,52 @@
+name: Camera catalogue
+on:
+  push:
+    paths:
+      - 'boards/**'
+      - 'soc/**'
+      - 'platforms/**/module.json'
+      - 'site/**'
+      - 'tools/build_site.py'
+      - 'tools/profiles.py'
+      - 'README.md'
+      - 'docs/**'
+      - 'project.json'
+      - '.github/workflows/pages.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: camera-catalogue-pages
+  cancel-in-progress: false
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Build public catalogue
+        run: python tools/build_site.py --repository "$GITHUB_REPOSITORY"
+      - name: Check catalogue and local links
+        run: python -m unittest discover -s tests -p test_site.py -v
+      - name: Configure Pages
+        if: github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
+        uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: output/site
+  deploy:
+    if: github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
+    needs: build
+    runs-on: ubuntu-24.04
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy catalogue
+        id: deployment
+        uses: actions/deploy-pages@v4
