@@ -1,0 +1,29 @@
+#!/bin/sh
+# Invoked through its RAM path by the static installer. Do not kill the media
+# owner: it retains SDK buffers and closes RTSP itself on SIGUSR1. HTTP remains
+# alive for progress; its compiled assets and all mapped code are in RAM.
+set -eu
+umask 077
+cd /
+R=${CAMERA_NETWORK_RUNTIME:-/var/run/camera-network}
+boot_id=$(cat /proc/sys/kernel/random/boot_id)
+printf '%s\n' "$boot_id" >"$R/quiesced.tmp"
+mv "$R/quiesced.tmp" "$R/quiesced"
+if [ -f /var/run/camera-application.pid ]; then
+    pid=$(cat /var/run/camera-application.pid)
+    case "$pid" in ''|*[!0-9]*) exit 1;; esac
+    kill -USR1 "$pid"
+else
+    echo 'Missing application owner PID; refusing unverified quiesce' >&2
+    exit 1
+fi
+# Wait for the media owner to acknowledge its current boot. Retained media
+# resources are intentional; a sent signal alone is insufficient evidence.
+boot_id=$(cat /proc/sys/kernel/random/boot_id)
+for attempt in $(/bin/busybox seq 1 35); do
+    if [ -f /tmp/camera-update/quiesced ] && [ "$(cat /tmp/camera-update/quiesced)" = "$boot_id" ]; then exit 0; fi
+    sleep 1
+done
+echo 'Application did not acknowledge quiesce' >&2
+exit 1
+# Installer independently performs normal umount /usr and refuses busy state.

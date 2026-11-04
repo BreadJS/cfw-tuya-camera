@@ -1,0 +1,42 @@
+{
+  "base_uimage_sha256": "7a64faa44c9f0dc7b8f2ab21b67078bcb55f792684363c920ecddcf0819a9d37",
+  "base_decompressed_sha256": "d92abc48d977e41b4c5c430916a4cdc89699e2448c9124ec379b44bf96fadf58",
+  "kernel_uimage_sha256": "4bb984f46c9d0347f9156bd4b91bb78cdc39fa27054a5b2b8279e3726f3392c5",
+  "patched_decompressed_sha256": "21583c8ca9e5e9cc531ec520be9183510ba6fce4ad812b925f84f142091e01e5",
+  "image_bytes": 1899344,
+  "decompressed_modified_range": {
+    "address": "0xc04bf474",
+    "bytes": 16,
+    "before": "0010a0e300009fe5a113f5eaa0a04ec0",
+    "after": "10402de9e06cedeb0000a0e31080bde8"
+  },
+  "assembly": [
+    "push {r4, lr}",
+    "bl 0xc001a800 (stock board fh_wdt_pause)",
+    "mov r0, #0",
+    "pop {r4, pc}"
+  ],
+  "literal_xrefs": [
+    "0xc04bf478"
+  ],
+  "next_function": "0xc04bf484 mmc_init, unchanged",
+  "behavior": "pause watchdog clock using stock board function; do not register watchdog driver or its ping timer",
+  "xz_bytes": 1882956,
+  "xz_zero_padding": 944,
+  "wrapper_and_tail_unchanged": true,
+  "all_other_decompressed_bytes_unchanged": true,
+  "module_abi_and_kernel_version_unchanged": true,
+  "evidence": [
+    "ev_ab1373917f8fa1c51899a6d98c3af84efa7800c67fe214406be559e1db71361b",
+    "ev_1e08f87725ac3fa893676ef5f23fb0e986dc97026d266990c5b8aec581db58c4",
+    "ev_bec4823c37f27632cd193e484ffe221ce85cf48f72200d4144953b8b097f01d4"
+  ],
+  "boot_tested": true,
+  "ready_to_flash": true,
+  "validation": {
+    "hardware": "see config/hardware-validation.json and docs/evidence/",
+    "RAM_boot_tested": true,
+    "NOR_kernel_written": true,
+    "hardware_watchdog_clock_paused": true
+  }
+}

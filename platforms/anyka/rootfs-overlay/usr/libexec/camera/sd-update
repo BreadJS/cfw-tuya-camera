@@ -1,0 +1,100 @@
+#!/bin/sh
+# Signed updates for cameras already running our APP. Never executes SD code,
+# stock firmware.bin or retained vendor updater scripts. SD is mounted read-only.
+set -u
+umask 077
+cd /
+export PATH=/tmp/camera-runtime:/bin:/sbin
+R=/tmp/camera-update
+M=/tmp/camera-sd
+B=/tmp/camera-runtime
+log() { echo "CAMERA_SD_UPDATE $*"; }
+owned_staging=0
+release_staging() {
+    if [ "$owned_staging" = 1 ]; then
+        rm -f "$R/sd-candidate.new" "$R/sd-candidate.cap"
+        rmdir "$R/staging.lock" || return 1
+        owned_staging=0
+    fi
+}
+mkdir -p "$R" "$M"
+chmod 700 "$R" "$M"
+mounted=0
+for attempt in 1 2 3 4 5; do
+    for device in /dev/mmcblk0p1 /dev/mmcblk0; do
+        if [ -b "$device" ] && mount -t vfat -o ro,nosuid,nodev,noexec,umask=077 "$device" "$M" 2>/dev/null; then mounted=1; break; fi
+    done
+    [ "$mounted" = 0 ] || break
+    sleep 1
+done
+[ "$mounted" = 1 ] || exit 0
+source=$M/camera-app.cap
+if [ ! -f "$source" ] || [ -L "$source" ]; then umount "$M"; exit 0; fi
+bytes=$(/bin/busybox wc -c <"$source")
+if [ "$bytes" != 5243072 ]; then log rejected_wrong_capsule_size; umount "$M"; exit 0; fi
+# Wait for our HTTP listener, which starts only after media, executor and the
+# update adapter are initialized. A PID file alone is not readiness evidence.
+ready=0
+for attempt in $(/bin/busybox seq 1 60); do
+    response=$(printf 'GET / HTTP/1.0\r\nHost: localhost\r\n\r\n' | /bin/busybox timeout 2 /bin/busybox nc -w 1 127.0.0.1 @CAMERA_HTTP_PORT@ 2>/dev/null | /bin/busybox head -n 1)
+    case "$response" in HTTP/1.*) ready=1; break;; esac
+    sleep 2
+done
+if [ "$ready" != 1 ]; then log service_not_ready_no_flash; umount "$M"; exit 0; fi
+# C publishes this marker only after checking actual APP mount and byte
+# provenance. A RAM-overlay test or environment variable is not install authority.
+if [ ! -f "$B/app-source" ] || [ -L "$B/app-source" ] ||
+   [ "$(/bin/busybox stat -c '%u:%a:%h:%s' "$B/app-source" 2>/dev/null)" != '0:600:1:9' ] ||
+   [ "$(cat "$B/app-source")" != APP-mtd7 ]; then
+    log not_real_app_boot_no_flash
+    umount "$M"
+    exit 0
+fi
+if ! mkdir "$R/staging.lock" 2>/dev/null; then log staging_busy_no_flash; umount "$M"; exit 0; fi
+owned_staging=1
+# Unique name avoids the HTTP worker's candidate.cap. No preexisting RAM file
+# can be replaced. The static installer independently checks size/owner/mode.
+if ! (set -C; cat "$source" >"$R/sd-candidate.new"); then log staging_failed; release_staging; umount "$M"; exit 0; fi
+chmod 400 "$R/sd-candidate.new"
+mv "$R/sd-candidate.new" "$R/sd-candidate.cap" || { release_staging; umount "$M"; exit 0; }
+umount "$M" || { log sd_unmount_failed; release_staging; exit 0; }
+if ! "$B/camera-installer" --verify "$R/sd-candidate.cap"; then
+    log rejected_signature_sequence_or_board
+    release_staging
+    exit 0
+fi
+# Adoption authenticates the current flashed APP, avoids a second erase of
+# first-install firmware, journals its signed sequence and requires one reboot.
+# A prior-boot written receipt must proceed to health confirmation, not loop.
+"$B/camera-installer" --adopt-current "$R/sd-candidate.cap"
+adopt=$?
+case "$adopt" in
+    0)
+        log current_app_authenticated_reboot_for_health_confirmation
+        release_staging
+        /bin/busybox sync
+        /sbin/reboot -f
+        exit 0
+        ;;
+    4)
+        log current_app_pending_health_no_reflash
+        release_staging
+        exit 0
+        ;;
+    3) :;; # Different signed APP; existing quiesce/apply path follows.
+    *)
+        log current_app_check_refused_no_flash
+        release_staging
+        exit 0
+        ;;
+esac
+if ! /bin/sh "$B/quiesce-for-update"; then log quiesce_refused_no_flash; release_staging; exit 0; fi
+if "$B/camera-installer" --apply "$R/sd-candidate.cap"; then
+    log verified_written_rebooting
+    /bin/busybox sync
+    /sbin/reboot -f
+else
+    # An apply error may follow an erase; never restart a producer or pretend
+    # normal operation is safe. Retain logs and resources for recovery.
+    log apply_failed_keep_power_and_recover
+fi

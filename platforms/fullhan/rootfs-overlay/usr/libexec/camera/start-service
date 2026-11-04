@@ -1,0 +1,25 @@
+#!/bin/sh
+set -eu
+[ -f /var/run/camera-boot-ready ] || exit 1
+umask 077
+# Preserve current operator configuration; no Tuya configuration is imported.
+if [ ! -f /etc/conf/camera/update.pub ]; then
+    cp /usr/share/camera/update.pub /etc/conf/camera/update.pub
+    chmod 600 /etc/conf/camera/update.pub
+fi
+DHCP_CLIENT_PID=$(cat /var/run/camera-dhcp.pid)
+case "$DHCP_CLIENT_PID" in ''|*[!0-9]*) exit 1 ;; esac
+# Independent time client retries after Wi-Fi recovery; provisioning stays usable
+# even without an Internet connection. New RTSP sessions sample the current clock.
+/usr/sbin/camera-time > /var/tmp/camera-time.log 2>&1 &
+printf '%s\n' "$!" > /var/run/camera-time.pid
+attempt=0
+while [ ! -f /var/run/camera-time-synchronized ] && [ "$attempt" -lt 12 ]; do
+    sleep 1
+    attempt=$((attempt + 1))
+done
+# No retry loop: media teardown remains reset-only after hardware initialization.
+exec /usr/sbin/camera-service --camera-service /usr/share/camera/bootstrap.auth \
+    --color-seed /usr/share/camera/isp.seed --shutter-max-lines 338 --mains-hz 50 \
+    --control-key /etc/conf/camera/update.pub --dhcp-pid "$DHCP_CLIENT_PID" \
+    > /dev/console 2>&1

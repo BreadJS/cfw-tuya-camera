@@ -1,0 +1,14 @@
+#!/bin/sh
+# Trust baseline only for a directory created by this boot. Existing journals
+# are never repaired, truncated or reset; the installer validates them.
+set -eu
+umask 077
+[ "$#" = 1 ] || exit 1
+case "$1" in /*) :;; *) exit 1;; esac
+[ ! -L "$1" ] || exit 1
+if [ ! -e "$1" ]; then
+    mkdir -m 700 "$1"
+    (set -C; printf '0\n' >"$1/accepted")
+    /bin/busybox sync
+fi
+[ -d "$1" ]

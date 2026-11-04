@@ -1,0 +1,21 @@
+{
+  "schema": 1,
+  "board_id": "ak39ev330-mis2006-ptz-8m-v1",
+  "immutable": {
+    "dtb": {
+      "bytes": 49152,
+      "sha256": "de8f9d3923ef99ed99a58d4b5b8bea9d51a5b08251ef46cc41f2a02e4203fcb3",
+      "blake2b": "96a55554bbb8b8854eb5f5d7fc7ff57ae800a71f7d56c76fe7469275490afe69a3b386e47f03b22451b7e2954d56d5f162774ff23eaf563c1b9e46054cb251a6"
+    },
+    "kernel": {
+      "bytes": 1572864,
+      "sha256": "830255b86562b40097a28fd6867fba9519167fee9378000d5331d5a4d6f968dc",
+      "blake2b": "16d815d7a8a5efb9853fddb28888016890fa39eaff34540555b37c70358b613bdf7d1052f3d1de00fa437bc9ec0da133991bcb8ce91dd6f0a4fa47d29d3d5a2e"
+    },
+    "rootfs": {
+      "bytes": 1048576,
+      "sha256": "a143a80985dff66e261a5c84f9f62808e42e056a0c47b7d6d84a65e440910e88",
+      "blake2b": "f09d335bfa4cf4c4b028686829b75d04e5004393522c0aac6442a929666689a9c3e5d901885a447092eed6a4e8fa903dfa23937602e069a11fead7cb57f9362b"
+    }
+  }
+}

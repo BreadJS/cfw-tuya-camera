@@ -1,0 +1,17 @@
+{
+  "tests": 10,
+  "result": "PASS",
+  "sanitizers": [
+    "address",
+    "undefined"
+  ],
+  "command": "python3 custom-firmware/tests/display/test_settings.py",
+  "static_arm_link": "PASS ARMv6 EABI5 softfloat static; compile only",
+  "device_accessed": false,
+  "sha256": {
+    "custom-firmware/src/display/settings.c": "9f93f4fb1e73efcf5b31ffb67e7df49d1ef14906d3a2a8726d6db7edd01135e3",
+    "custom-firmware/src/display/settings.h": "545498e5efb973852ed7fc96496674e04ab9a3857d46ef6b2bc7d4dc3d628052",
+    "custom-firmware/tests/display/driver.c": "c77e38e21f5b02749b1a8df104a9725e36818841ed992cc0cead4f70fd207d53",
+    "custom-firmware/tests/display/test_settings.py": "39e4c7321612623bef4bf9f178d23eb4c77a6bb7ee864f76c729718025006b81"
+  }
+}

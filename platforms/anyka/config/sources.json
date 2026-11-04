@@ -1,0 +1,13 @@
+[
+  "src/native/control/http.c",
+  "src/native/control/credentials.c",
+  "src/native/rtsp/camera_rtsp.c",
+  "src/native/rtsp/h264_parameters.c",
+  "src/preview/preview.c",
+  "src/preview/mp4.c",
+  "src/display/settings.c",
+  "src/rotation/settings.c",
+  "src/osd/timestamp.c",
+  "src/time/camera_time.c",
+  "src/anyka/sdk_api.c"
+]

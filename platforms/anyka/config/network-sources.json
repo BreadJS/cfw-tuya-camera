@@ -1,0 +1,12 @@
+{
+  "hostapd": {
+    "version": "2.12",
+    "url": "https://w1.fi/releases/hostapd-2.12.tar.gz",
+    "sha256": "f43502561c28ba47ab77e18e1a973d07361c68cc8b14178e619bd5796b70eabd"
+  },
+  "libnl_tiny": {
+    "url": "https://git.openwrt.org/project/libnl-tiny.git",
+    "commit": "40493a655d8caa2ccf5206dde1e733abe2920432",
+    "tree_sha256": "50a5888d676256e464b5a05bf5dec32cba8b20883c451367d7fc9fb8d5e7ac10"
+  }
+}

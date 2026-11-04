@@ -1,0 +1,17 @@
+{
+  "tests": 15,
+  "result": "PASS",
+  "sanitizers": [
+    "address",
+    "undefined"
+  ],
+  "command": "python3 custom-firmware/tests/reset_config/test_reset.py",
+  "static_arm_cli": "ELF32 ARM EABI5 static; compiled only, never executed on camera",
+  "device_accessed": false,
+  "sha256": {
+    "custom-firmware/src/reset/config_reset.c": "1a51d3ea69cdd5bc10d5479bbdbef88b8aaafc1c5c91c2a2ed7dde177812f5e7",
+    "custom-firmware/src/reset/config_reset.h": "4ee5df279b158ac7fe404ed3f6569831c88c4b48ec2ed973bfb80238e802a0ab",
+    "custom-firmware/tests/reset_config/driver.c": "17e797cdb0ea689c4cace071c5f82c08bdd1ff8c523c746c7a6d2eb1ad423290",
+    "custom-firmware/tests/reset_config/test_reset.py": "907449763c8bfcacb2b3c223fd86a356cbcabb4f0649f4c4cac7062fda6e1af6"
+  }
+}

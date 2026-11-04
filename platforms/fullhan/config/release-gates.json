@@ -1,0 +1,17 @@
+{
+  "ready_to_flash": true,
+  "scope": "exact FH8626V100/MIS2006/8MiB board and partition layout",
+  "verified": [
+    "Watchdog-disabled compatibility kernel: RAM and NOR boots, hardware clock readback",
+    "1080p15 H264 video and PCMA microphone audio in VLC and FFmpeg",
+    "Wi-Fi scan, recovery hotspot association/DHCP/provisioning",
+    "Signed OTA install, full partition readback, reboot and health confirmation at sequence2",
+    "Corrected0.1.1 direct SD install: user reported completed and working"
+  ],
+  "known_limitations": [
+    "Single-bank firmware has no automatic power-loss rollback",
+    "RTSP session startup may wait for kernel entropy after a fresh boot",
+    "Recovery hotspot streaming throughput is limited; its primary purpose is provisioning"
+  ],
+  "evidence": "config/hardware-validation.json and docs/evidence/"
+}

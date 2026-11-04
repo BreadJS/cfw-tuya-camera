@@ -1,0 +1,21 @@
+{
+  "board": "ak39ev330-mis2006-ptz-8m-v1",
+  "images": {
+    "dtb": {
+      "bytes": 49152,
+      "sha256": "de8f9d3923ef99ed99a58d4b5b8bea9d51a5b08251ef46cc41f2a02e4203fcb3"
+    },
+    "kernel": {
+      "bytes": 1572864,
+      "sha256": "830255b86562b40097a28fd6867fba9519167fee9378000d5331d5a4d6f968dc"
+    },
+    "rootfs": {
+      "bytes": 1048576,
+      "sha256": "a143a80985dff66e261a5c84f9f62808e42e056a0c47b7d6d84a65e440910e88"
+    },
+    "app": {
+      "bytes": 5242880,
+      "sha256": "2edd5883fd78f2d288ba1ce9d2bf1c3f2a3e8adfe155f0d4d046c27ed152c773"
+    }
+  }
+}

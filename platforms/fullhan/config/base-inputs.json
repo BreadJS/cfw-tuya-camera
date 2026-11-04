@@ -1,0 +1,106 @@
+{
+  "base/rootfs/bin/busybox": {
+    "source": "ipcam_hack_extracted/rootfs/bin/busybox",
+    "sha256": "c406bb2990636352cbf1f55b69e3ab7de3bf3bb4d03728506839e5a8b2f2f58b"
+  },
+  "base/rootfs/bin/hostapd": {
+    "source": "ipcam_hack_extracted/rootfs/bin/hostapd",
+    "sha256": "08d78573e5794154a1cb100e62c5fa3e2b66c76345473673110d2a0a66b4001b"
+  },
+  "base/rootfs/bin/wpa_cli": {
+    "source": "ipcam_hack_extracted/rootfs/bin/wpa_cli",
+    "sha256": "0a7d580a86fea1417dc211167a73f9e6cf0c92aee87f0ec3ef87f7f747037dae"
+  },
+  "base/rootfs/bin/wpa_supplicant": {
+    "source": "ipcam_hack_extracted/rootfs/bin/wpa_supplicant",
+    "sha256": "e84e47d1856490d977824dc6540a7d0063b46cac7798372c811f0b19bb2b4c02"
+  },
+  "base/rootfs/etc/ssv6x5x-wifi.cfg": {
+    "source": "ipcam_hack_extracted/rootfs/etc/ssv6x5x-wifi.cfg",
+    "sha256": "d7d655afe96ac2c180a22350b6b898a3a378b2e0984c42222b2df4777d9a88a9"
+  },
+  "base/rootfs/lib/ld-uClibc-0.9.33.2.so": {
+    "source": "ipcam_hack_extracted/rootfs/lib/ld-uClibc-0.9.33.2.so",
+    "sha256": "c537328f7ca8dba3d641affd7986795c6d35779d8a389ccda7d0bff243bcbddb"
+  },
+  "base/rootfs/lib/libcrypt-0.9.33.2.so": {
+    "source": "ipcam_hack_extracted/rootfs/lib/libcrypt-0.9.33.2.so",
+    "sha256": "45a7d316a56188c5c5bdb7059aab9cadd3e8f881a4725c988b6f0744783b1435"
+  },
+  "base/rootfs/lib/libdl-0.9.33.2.so": {
+    "source": "ipcam_hack_extracted/rootfs/lib/libdl-0.9.33.2.so",
+    "sha256": "72b577d58b6455a6b1a83b5a4bbd72e6dcd1f026dc3bbf437e02437f16776c2a"
+  },
+  "base/rootfs/lib/libm-0.9.33.2.so": {
+    "source": "ipcam_hack_extracted/rootfs/lib/libm-0.9.33.2.so",
+    "sha256": "7cae96ef8bcca72f4c0451a4fde7065a851df5c114df0b7c36742c871f084039"
+  },
+  "base/rootfs/lib/libpthread-0.9.33.2.so": {
+    "source": "ipcam_hack_extracted/rootfs/lib/libpthread-0.9.33.2.so",
+    "sha256": "3a5dcc10e527747ab7a11bf695f7b694557bf4de799cbf1d65da2b31b5da11ef"
+  },
+  "base/rootfs/lib/librt-0.9.33.2.so": {
+    "source": "ipcam_hack_extracted/rootfs/lib/librt-0.9.33.2.so",
+    "sha256": "c3bd1c914ac6cad57fe9630ff9af61f8e323a485ac3f4e8e68b1f5002985e052"
+  },
+  "base/rootfs/lib/libuClibc-0.9.33.2.so": {
+    "source": "ipcam_hack_extracted/rootfs/lib/libuClibc-0.9.33.2.so",
+    "sha256": "e49813b6d8fcee4499f31380c6d8667d0e22937785a2648798206ac67d34fd34"
+  },
+  "base/rootfs/sbin/udevadm": {
+    "source": "ipcam_hack_extracted/rootfs/sbin/udevadm",
+    "sha256": "e3a0f0f7eb5905940d02ca27f5bcb4c33c319c937658d792227ad6d96d92a482"
+  },
+  "base/rootfs/sbin/udevd": {
+    "source": "ipcam_hack_extracted/rootfs/sbin/udevd",
+    "sha256": "0f924b5bdc16fd1c69dc74417a3210eadb5a1013d0dd98035914035188631d4f"
+  },
+  "base/rootfs/usr/modules/bgm.ko": {
+    "source": "ipcam_hack_extracted/rootfs/usr/modules/bgm.ko",
+    "sha256": "d81a9e74f9a01a2d6b85b6bc226613ae5fb7a0584b00630327dd6cf2a5e6897a"
+  },
+  "base/rootfs/usr/modules/enc.ko": {
+    "source": "ipcam_hack_extracted/rootfs/usr/modules/enc.ko",
+    "sha256": "90d41ba10ddce9540411b9d1eefd42929256ad0305455d1ac9e29ca4c5fef16c"
+  },
+  "base/rootfs/usr/modules/isp.ko": {
+    "source": "ipcam_hack_extracted/rootfs/usr/modules/isp.ko",
+    "sha256": "790a18d2eaa21f0b38d74a535849f72a44e78cd097db4693ea7e869000631567"
+  },
+  "base/rootfs/usr/modules/jpeg.ko": {
+    "source": "ipcam_hack_extracted/rootfs/usr/modules/jpeg.ko",
+    "sha256": "c30b55183ffa727f9817dc297a733c42d62056b3f46e4ea97ed4d0ed815a45a7"
+  },
+  "base/rootfs/usr/modules/media_process.ko": {
+    "source": "ipcam_hack_extracted/rootfs/usr/modules/media_process.ko",
+    "sha256": "ea50062a5bf18f2cb773250f5e0d369cc22cb5026072c87474117bca902209c0"
+  },
+  "base/rootfs/usr/modules/rtthread_arc_FH8626V100.bin": {
+    "source": "ipcam_hack_extracted/rootfs/usr/modules/rtthread_arc_FH8626V100.bin",
+    "sha256": "4c1df9e49e2a7d8a0627cfea2ff3b255341fc8673623d59425e8c7bd44bfa73d"
+  },
+  "base/rootfs/usr/modules/rtvbus.ko": {
+    "source": "ipcam_hack_extracted/rootfs/usr/modules/rtvbus.ko",
+    "sha256": "c6d88769f771881a86f9ee8da12928f0e76e75488880ac96f9242c14ad786a59"
+  },
+  "base/rootfs/usr/modules/ssv6x5x.ko": {
+    "source": "ipcam_hack_extracted/rootfs/usr/modules/ssv6x5x.ko",
+    "sha256": "6ccc632b923daab29bf1395d240e40677c695599f4c6f847b66371bb35432c99"
+  },
+  "base/rootfs/usr/modules/vbus_ac.ko": {
+    "source": "ipcam_hack_extracted/rootfs/usr/modules/vbus_ac.ko",
+    "sha256": "d22838c847d278eeb15c2362155fd45363ee9f8200d7950200730333eb7e4c19"
+  },
+  "base/rootfs/usr/modules/vmm.ko": {
+    "source": "ipcam_hack_extracted/rootfs/usr/modules/vmm.ko",
+    "sha256": "353943368eafcc8bdbea0f8300e35636f63fd74e0fb56aaa33ba5895166dcbc4"
+  },
+  "base/kernel.uImage": {
+    "source": "ipcam_hack_extracted/partitions/02_kernel_uimage.bin",
+    "sha256": "7a64faa44c9f0dc7b8f2ab21b67078bcb55f792684363c920ecddcf0819a9d37"
+  },
+  "base/kernel-no-watchdog.uImage": {
+    "source": "base/kernel.uImage + tools/prepare_watchdog_disabled_kernel.py; exact reviewed16-byte watchdog-init patch",
+    "sha256": "4bb984f46c9d0347f9156bd4b91bb78cdc39fa27054a5b2b8279e3726f3392c5"
+  }
+}

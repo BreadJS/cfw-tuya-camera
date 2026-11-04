@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "id": "fh8626v100",
+  "backend": "fullhan",
+  "chip": "Fullhan FH8626V100",
+  "cpu": "arm1176jzf-s",
+  "architecture": "armv6",
+  "libc": "musl-static",
+  "gpio_style": "uppercase",
+  "gpio_max": 95,
+  "media_driver": "fh-native-mis2006",
+  "update_driver": "fh-kernel-ramroot",
+  "module_root": "platforms/fullhan",
+  "supported_sensors": [
+    "mis2006"
+  ],
+  "toolchain": {
+    "url": "https://github.com/OpenIPC/firmware/releases/download/toolchain/toolchain.hisilicon-hi3516cv100.tgz",
+    "bytes": 102606142,
+    "sha256": "466683e215a493144ba87b3d57a733864b6db318aad847bf0fd0616dda39729e",
+    "compiler_relative": "arm-openipc-linux-musleabi_sdk-buildroot/bin/arm-openipc-linux-musleabi-gcc",
+    "archive_type": "tar.gz"
+  }
+}

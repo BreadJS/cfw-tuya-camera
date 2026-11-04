@@ -1,0 +1,22 @@
+#!/bin/sh
+set -eu
+umask 077
+mkdir -p /var/run/wpa_supplicant
+if [ -f /etc/conf/camera/wpa_supplicant.conf ]; then
+    cp /etc/conf/camera/wpa_supplicant.conf /var/tmp/camera-cold-wpa.conf
+else
+    # No saved AP: supplicant still exposes scans/control for hotspot setup.
+    printf 'ctrl_interface=/var/run/wpa_supplicant\nupdate_config=0\nap_scan=1\n' > /var/tmp/camera-cold-wpa.conf
+fi
+chmod 600 /var/tmp/camera-cold-wpa.conf
+ifconfig wlan0 up
+/bin/wpa_supplicant -Dnl80211 -i wlan0 -c /var/tmp/camera-cold-wpa.conf > /var/tmp/camera-wpa.log 2>&1 &
+printf '%s\n' "$!" > /var/run/camera-wpa.pid
+/bin/busybox udhcpc -f -i wlan0 -h camera -s /usr/libexec/camera/dhcp-hook > /var/tmp/camera-dhcp.log 2>&1 &
+printf '%s\n' "$!" > /var/run/camera-dhcp.pid
+attempt=0
+while [ ! -S /var/run/wpa_supplicant/wlan0 ]; do
+    attempt=$((attempt + 1))
+    [ "$attempt" -lt 15 ] || exit 1
+    sleep 1
+done

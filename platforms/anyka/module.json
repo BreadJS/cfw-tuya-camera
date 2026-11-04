@@ -1,0 +1,62 @@
+{
+  "schema": 1,
+  "id": "anyka",
+  "adapter": "adapter.py",
+  "gpio_drivers": [
+    "latched_gpio",
+    "gpio",
+    "led_class",
+    "evdev"
+  ],
+  "ptz_drivers": [
+    "ak_motor"
+  ],
+  "flash_bytes": [
+    8388608
+  ],
+  "runtime": {
+    "config_directory": "/etc/config/camera",
+    "login_initial": "/tmp/camera-runtime/bootstrap.auth",
+    "login_home": "/tmp",
+    "login_path": "/tmp/camera-runtime:/bin:/sbin:/usr/bin:/usr/sbin"
+  },
+  "partitions": {
+    "app": {
+      "mtd": 7,
+      "offset": 3145728,
+      "bytes": 5242880
+    },
+    "protected_mtd": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ]
+  },
+  "host_tests": [
+    "tests/anyka/test_owned_components.py",
+    "tests/anyka/test_audio_backend.py",
+    "tests/anyka/test_media_backend.py",
+    "tests/anyka/test_encoder_control.py"
+  ],
+  "feature_drivers": {
+    "ircut": [
+      "latched_gpio"
+    ],
+    "ir_led": [
+      "gpio",
+      "led_class"
+    ],
+    "status_led": [
+      "gpio",
+      "led_class"
+    ],
+    "reset": [
+      "gpio",
+      "evdev"
+    ]
+  }
+}

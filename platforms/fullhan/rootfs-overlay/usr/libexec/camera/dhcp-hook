@@ -1,0 +1,27 @@
+#!/bin/sh
+# Fixed interface; no eval or execution of DHCP-supplied strings.
+[ "$interface" = wlan0 ] || exit 1
+case "$1" in
+    deconfig) /bin/ifconfig wlan0 0.0.0.0 ;;
+    bound|renew)
+        if [ -n "$subnet" ]; then
+            /bin/ifconfig wlan0 "$ip" netmask "$subnet"
+        else
+            /bin/ifconfig wlan0 "$ip"
+        fi
+        while /bin/route del default gw 0.0.0.0 dev wlan0 2>/dev/null; do :; done
+        metric=0
+        for gateway in $router; do
+            /bin/route add default gw "$gateway" dev wlan0 metric "$metric"
+            printf '%s\n' "$gateway" > /var/run/camera-time-gateway
+            metric=$((metric + 1))
+        done
+        umask 077
+        : > /var/nm/resolv.conf.new
+        for server in $dns; do
+            printf 'nameserver %s\n' "$server" >> /var/nm/resolv.conf.new
+        done
+        /bin/mv /var/nm/resolv.conf.new /var/nm/resolv.conf
+        ;;
+esac
+exit 0

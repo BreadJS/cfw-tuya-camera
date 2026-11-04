@@ -1,0 +1,172 @@
+{
+  "schema": 1,
+  "sensor": "mis2006",
+  "ports": {
+    "http": 81,
+    "rtsp": 8554,
+    "telnet": 23
+  },
+  "services": [
+    "http",
+    "rtsp",
+    "preview",
+    "wifi",
+    "hotspot",
+    "signed_updates",
+    "clock",
+    "telnet"
+  ],
+  "capabilities": {
+    "audio": true,
+    "timestamp": true,
+    "rotation": true,
+    "picture": true,
+    "ircut": true,
+    "ir_led": true,
+    "status_led": true,
+    "reset": true,
+    "ptz": true
+  },
+  "flash_bytes": 8388608,
+  "id": "lsc-smart-rotatable",
+  "name": "LSC Smart Rotatable Camera",
+  "soc": "ak39ev330",
+  "firmware_compatibility_id": "ak39ev330-mis2006-ptz-8m-v1",
+  "gpio": {
+    "ircut": {
+      "driver": "latched_gpio",
+      "select_pin": 6,
+      "enable_pin": 67,
+      "day_level": 1,
+      "enable_level": 1,
+      "settle_us": 50000
+    },
+    "ir_led": {
+      "driver": "led_class",
+      "binding": "ir_led",
+      "pin": 7,
+      "name": "ir_led",
+      "active_level": 1
+    },
+    "status_led": {
+      "driver": "led_class",
+      "binding": "status_led",
+      "pin": 42,
+      "name": "state_led",
+      "active_level": 1
+    },
+    "reset": {
+      "driver": "evdev",
+      "binding": "reset",
+      "pin": 5,
+      "device": "/dev/input/event0",
+      "code": 116,
+      "active_level": 0,
+      "hold_seconds": 5
+    }
+  },
+  "ptz": {
+    "driver": "ak_motor",
+    "speed_steps_per_second": 600,
+    "steps_per_circle": 4096,
+    "hold_lease_ms": 400,
+    "pan": {
+      "binding": "ptz_pan",
+      "device": "/dev/motor0",
+      "pins": [
+        8,
+        41,
+        79,
+        34
+      ],
+      "travel_steps": 4096,
+      "invert": false
+    },
+    "tilt": {
+      "binding": "ptz_tilt",
+      "device": "/dev/motor1",
+      "pins": [
+        81,
+        80,
+        9,
+        68
+      ],
+      "travel_steps": 2048,
+      "invert": false
+    }
+  },
+  "partitions": {
+    "app": {
+      "mtd": 7,
+      "offset": 3145728,
+      "bytes": 5242880
+    },
+    "protected_mtd": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ]
+  },
+  "qualification": "new-profile-image-needs-boot-evidence",
+  "kernel_bindings": {
+    "ir_led": {
+      "driver": "led_class",
+      "name": "ir_led",
+      "pins": [
+        7
+      ],
+      "dt_node": "/leds/ir_led",
+      "dt_property": "gpios",
+      "active_level": 1
+    },
+    "status_led": {
+      "driver": "led_class",
+      "name": "state_led",
+      "pins": [
+        42
+      ],
+      "dt_node": "/leds/state_led",
+      "dt_property": "gpios",
+      "active_level": 1
+    },
+    "reset": {
+      "driver": "evdev",
+      "device": "/dev/input/event0",
+      "code": 116,
+      "pins": [
+        5
+      ],
+      "dt_node": "/gpiokeys/key_detect",
+      "dt_property": "gpios",
+      "active_level": 0
+    },
+    "ptz_pan": {
+      "driver": "ak_motor",
+      "device": "/dev/motor0",
+      "pins": [
+        8,
+        41,
+        79,
+        34
+      ],
+      "dt_node": "/motor0",
+      "dt_property": "pwm-pins"
+    },
+    "ptz_tilt": {
+      "driver": "ak_motor",
+      "device": "/dev/motor1",
+      "pins": [
+        81,
+        80,
+        9,
+        68
+      ],
+      "dt_node": "/motor1",
+      "dt_property": "pwm-pins"
+    }
+  }
+}

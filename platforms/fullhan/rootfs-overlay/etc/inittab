@@ -1,0 +1,5 @@
+::sysinit:/etc/init.d/rcS
+::once:/usr/libexec/camera/start-service
+::once:/usr/libexec/camera/start-telnet
+::askfirst:/bin/sh
+::shutdown:/bin/umount -a -r

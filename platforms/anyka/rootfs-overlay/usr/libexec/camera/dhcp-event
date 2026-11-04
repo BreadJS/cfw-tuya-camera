@@ -1,0 +1,34 @@
+#!/bin/sh
+set -eu
+umask 077
+valid_ipv4() (
+    case "$1" in ''|.*|*.|*[!0-9.]*) exit 1;; esac
+    IFS=.
+    set -- $1
+    [ "$#" = 4 ] || exit 1
+    for octet do
+        case "$octet" in 0|[1-9]|[1-9][0-9]|[1-9][0-9][0-9]) :;; *) exit 1;; esac
+        [ "$octet" -le 255 ] || exit 1
+    done
+)
+R=${CAMERA_NETWORK_RUNTIME:-/var/run/camera-network}
+case "${1:-}" in
+    deconfig) rm -f "$R/network-ready" /var/run/camera-time-gateway; ifconfig "$interface" 0.0.0.0;;
+    bound|renew)
+        ifconfig "$interface" "$ip" netmask "${subnet:-255.255.255.0}"
+        route del default dev "$interface" 2>/dev/null || :
+        rm -f /var/run/camera-time-gateway
+        for gateway in ${router:-}; do
+            if route add default gw "$gateway" dev "$interface"; then
+                if valid_ipv4 "$gateway"; then
+                    printf '%s\n' "$gateway" >/var/run/.camera-time-gateway.tmp
+                    mv /var/run/.camera-time-gateway.tmp /var/run/camera-time-gateway
+                fi
+                break
+            fi
+        done
+        : >/etc/resolv.conf
+        for server in ${dns:-}; do printf 'nameserver %s\n' "$server" >>/etc/resolv.conf; done
+        printf 1 >"$R/network-ready"
+        ;;
+esac

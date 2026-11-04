@@ -1,0 +1,150 @@
+{
+  "status": "port_in_progress_no_flash_release",
+  "chip_marking": "AK3918EN080 V300S",
+  "hardware": "AK39EV330",
+  "cpu": "ARM926EJ-S",
+  "architecture": "ARMv5TEJ",
+  "float_abi": "soft",
+  "libc": "uClibc 1.0.28",
+  "kernel": "4.4.192V2.1 #1 2022-04-27",
+  "physical_ram_bytes": 67108864,
+  "linux_memtotal_kib": 35720,
+  "flash_bytes": 8388608,
+  "vendor_version": "3.10.56.1146",
+  "vendor_bundle": "HT_IPC167KM_TUYA_AK3918EV330",
+  "sensor": {
+    "loaded_module": "sensor_mis2006",
+    "profile": "/etc/config/isp_mis2006_mipi_2lane_h3b.conf",
+    "stock_main": {
+      "codec": "H264",
+      "width": 1920,
+      "height": 1080,
+      "fps": 15,
+      "rate_mode": "VBR",
+      "target_kbps": 512,
+      "max_kbps": 1024
+    },
+    "stock_sub": {
+      "codec": "H264",
+      "width": 640,
+      "height": 360,
+      "fps": 15
+    }
+  },
+  "wifi": {
+    "loaded_module": "rtl8188ftv",
+    "ap_fallback_verified": false
+  },
+  "ptz": {
+    "driver": "ak_motor",
+    "devices": [
+      "/dev/motor0",
+      "/dev/motor1"
+    ],
+    "stock_config_pan_steps": 4096,
+    "stock_config_tilt_steps": 2048,
+    "physical_limits_verified": false
+  },
+  "gpio_candidates": {
+    "reset": {
+      "pin": 5,
+      "active_low": true,
+      "source": "DTB gpiokeys/key_detect",
+      "physical_tested": false
+    },
+    "ir_led": {
+      "pin": 7,
+      "source": "DTB leds/ir_led",
+      "physical_tested": false
+    },
+    "status_led": {
+      "pin": 42,
+      "source": "DTB leds/state_led",
+      "physical_tested": false
+    },
+    "speaker_enable": {
+      "pin": 82,
+      "source": "_ht_hw_settings.ini",
+      "physical_tested": false
+    },
+    "ircut": {
+      "pins": [
+        6,
+        67
+      ],
+      "source": "DTB + _ht_hw_settings.ini",
+      "day_polarity_conflicts": true,
+      "physical_tested": false
+    }
+  },
+  "partitions": [
+    {
+      "index": 0,
+      "name": "UBOOT",
+      "offset": 0,
+      "bytes": 204800,
+      "erase_bytes": 4096,
+      "initial_policy": "preserve"
+    },
+    {
+      "index": 1,
+      "name": "ENV",
+      "offset": 204800,
+      "bytes": 4096,
+      "erase_bytes": 4096,
+      "initial_policy": "preserve"
+    },
+    {
+      "index": 2,
+      "name": "ENVBK",
+      "offset": 208896,
+      "bytes": 4096,
+      "erase_bytes": 4096,
+      "initial_policy": "preserve"
+    },
+    {
+      "index": 3,
+      "name": "DTB",
+      "offset": 212992,
+      "bytes": 49152,
+      "erase_bytes": 4096,
+      "initial_policy": "preserve"
+    },
+    {
+      "index": 4,
+      "name": "KERNEL",
+      "offset": 262144,
+      "bytes": 1572864,
+      "erase_bytes": 4096,
+      "initial_policy": "preserve"
+    },
+    {
+      "index": 5,
+      "name": "ROOTFS",
+      "offset": 1835008,
+      "bytes": 1048576,
+      "erase_bytes": 4096,
+      "initial_policy": "preserve"
+    },
+    {
+      "index": 6,
+      "name": "CONFIG",
+      "offset": 2883584,
+      "bytes": 262144,
+      "erase_bytes": 4096,
+      "initial_policy": "preserve"
+    },
+    {
+      "index": 7,
+      "name": "APP",
+      "offset": 3145728,
+      "bytes": 5242880,
+      "erase_bytes": 4096,
+      "initial_policy": "candidate_only_after_SD_trial"
+    }
+  ],
+  "board_id": "ak39ev330-mis2006-ptz-8m-v1",
+  "config_directory": "/etc/config/camera",
+  "web_port": 81,
+  "rtsp_port": 8554
+}

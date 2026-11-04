@@ -1,0 +1,55 @@
+{
+  "schema": 1,
+  "id": "fullhan",
+  "adapter": "adapter.py",
+  "gpio_drivers": [
+    "dual_gpio_pulse",
+    "gpio",
+    "gpio_channels"
+  ],
+  "ptz_drivers": [],
+  "flash_bytes": [
+    8388608
+  ],
+  "runtime": {
+    "config_directory": "/etc/conf/camera",
+    "login_initial": "/usr/share/camera/bootstrap.auth",
+    "login_home": "/root",
+    "login_path": "/bin:/sbin:/usr/bin:/usr/sbin"
+  },
+  "partitions": {
+    "kernel": {
+      "offset": 589824,
+      "bytes": 1900544
+    },
+    "rootfs": {
+      "offset": 2490368,
+      "bytes": 5570560
+    },
+    "config": {
+      "mtd": 5,
+      "preserve": true
+    }
+  },
+  "host_tests": [
+    "tests/reset_button/test_button.py",
+    "tests/interface/test_http.py",
+    "tests/telnet/test_login.py",
+    "tests/color/test_color.py",
+    "tests/picture/test_settings.py"
+  ],
+  "feature_drivers": {
+    "ircut": [
+      "dual_gpio_pulse"
+    ],
+    "ir_led": [
+      "gpio"
+    ],
+    "status_led": [
+      "gpio_channels"
+    ],
+    "reset": [
+      "gpio"
+    ]
+  }
+}

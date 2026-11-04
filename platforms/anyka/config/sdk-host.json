@@ -1,0 +1,14 @@
+{
+  "schema": 1,
+  "board": "ak39ev330-mis2006-ptz-8m-v1",
+  "source_sha256": "e2a2f0d484fb5c79e99521037397719574633f1c0f306f70a728a7ee72083c7e",
+  "source_bytes": 4881840,
+  "elf_entry": 391536,
+  "main_symbol": "main",
+  "main_address": 653488,
+  "main_file_offset": 587952,
+  "main_original_hex": "00482de904b08de216dd4de260050be5",
+  "fallback_exit": 125,
+  "sdk_host_sha256": "3507ad258eb74912bce1ae9dbc514cbe6c3e6460d2434dfdc2a85896b5f718ca",
+  "status": "transitional SDK host; retains proprietary code; not a clean media backend or flash image"
+}

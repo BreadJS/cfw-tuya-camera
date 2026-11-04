@@ -1,0 +1,89 @@
+{
+  "schema": 1,
+  "sensor": "mis2006",
+  "ports": {
+    "http": 81,
+    "rtsp": 8554,
+    "telnet": 23
+  },
+  "services": [
+    "http",
+    "rtsp",
+    "preview",
+    "wifi",
+    "hotspot",
+    "signed_updates",
+    "clock",
+    "telnet"
+  ],
+  "capabilities": {
+    "audio": true,
+    "timestamp": true,
+    "rotation": true,
+    "picture": true,
+    "ircut": true,
+    "ir_led": true,
+    "status_led": true,
+    "reset": true,
+    "ptz": false
+  },
+  "flash_bytes": 8388608,
+  "id": "lsc-smart-indoor",
+  "name": "LSC Smart Indoor IP Camera",
+  "soc": "fh8626v100",
+  "firmware_compatibility_id": "fh8626v100-mis2006-8m-v1",
+  "gpio": {
+    "ircut": {
+      "driver": "dual_gpio_pulse",
+      "pins": [
+        19,
+        20
+      ],
+      "flip": 1,
+      "pulse_us": 300000
+    },
+    "ir_led": {
+      "driver": "gpio",
+      "pin": 3,
+      "active_level": 1
+    },
+    "status_led": {
+      "driver": "gpio_channels",
+      "channels": [
+        {
+          "name": "red",
+          "pin": 2,
+          "active_level": 0
+        },
+        {
+          "name": "green",
+          "pin": 6,
+          "active_level": 0
+        }
+      ]
+    },
+    "reset": {
+      "driver": "gpio",
+      "pin": 23,
+      "active_level": 0,
+      "hold_seconds": 5
+    }
+  },
+  "ptz": null,
+  "partitions": {
+    "kernel": {
+      "offset": 589824,
+      "bytes": 1900544
+    },
+    "rootfs": {
+      "offset": 2490368,
+      "bytes": 5570560
+    },
+    "config": {
+      "mtd": 5,
+      "preserve": true
+    }
+  },
+  "qualification": "new-profile-image-needs-boot-evidence",
+  "kernel_bindings": {}
+}

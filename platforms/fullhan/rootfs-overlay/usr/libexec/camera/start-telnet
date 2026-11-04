@@ -1,0 +1,9 @@
+#!/bin/sh
+set -eu
+[ -f /var/run/camera-boot-ready ] || exit 1
+umask 077
+# The server owns PTYs; authentication uses saved web credentials before a shell.
+if [ ! -c /dev/ptmx ]; then
+    mknod /dev/ptmx c 5 2
+fi
+exec /bin/busybox telnetd -F -p @CAMERA_TELNET_PORT@ -l /usr/libexec/camera/telnet-login

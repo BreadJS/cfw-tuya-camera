@@ -1,0 +1,27 @@
+#!/bin/sh
+set -eu
+unset LD_PRELOAD
+umask 077
+cd /
+export PATH=/tmp/camera-runtime:/bin:/sbin
+export CAMERA_APPLICATION=1
+export CAMERA_PTZ_CALIBRATE="${CAMERA_PTZ_CALIBRATE:-1}"
+export CAMERA_NETWORK_RELOAD_DRIVER=1
+export CAMERA_NETWORK_MODULE_DIR=/usr/modules
+export CAMERA_SENSOR_PROFILE=/tmp/camera-runtime/isp_mis2006_mipi_2lane_h3b.conf
+export CAMERA_FONT_FILE=/tmp/camera-runtime/ak_font_16.bin
+export CAMERA_CONFIG_DIR="${CAMERA_CONFIG_DIR:-/etc/config/camera}"
+export CAMERA_OSD_ENABLE=1
+mkdir -p "$CAMERA_CONFIG_DIR/wifi" /var/run/camera-network /tmp/camera-update
+chmod 700 /tmp/camera-update
+/bin/sh /tmp/camera-runtime/init-update-state "$CAMERA_CONFIG_DIR/update"
+chmod 700 "$CAMERA_CONFIG_DIR" "$CAMERA_CONFIG_DIR/wifi" "$CAMERA_CONFIG_DIR/update" /var/run/camera-network
+# CONFIG remains intact across APP updates. Never run retained vendor scripts.
+# All subprocesses and their backing code are RAM or immutable ROOTFS /lib.
+/bin/sh /tmp/camera-runtime/network-supervisor >>/tmp/camera-network.log 2>&1 &
+echo $! >/var/run/camera-network/supervisor.pid
+(cd /tmp; exec /tmp/camera-runtime/camera-time) >>/tmp/camera-time.log 2>&1 &
+/bin/busybox telnetd -p @CAMERA_TELNET_PORT@ -l /tmp/camera-runtime/camera-login
+/bin/sh /tmp/camera-runtime/sd-update >>/tmp/camera-sd-update.log 2>&1 &
+export LD_PRELOAD=/tmp/camera-runtime/camera-application.so
+exec /tmp/camera-runtime/sdk-host

@@ -1,0 +1,13 @@
+{
+  "schema": 1,
+  "media_backend_verified": false,
+  "audio_backend_verified": false,
+  "ptz_limits_verified": false,
+  "watchdog_handoff_verified": false,
+  "wifi_ap_recovery_verified": false,
+  "sd_application_trial_verified": false,
+  "app_image_boot_verified": false,
+  "web_installer_verified": false,
+  "sd_installer_verified": false,
+  "uart_free_recovery_verified": false
+}

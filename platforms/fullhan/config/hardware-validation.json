@@ -1,0 +1,18 @@
+{
+  "version": "0.1.1",
+  "sd_image_sha256": "dd28206da7ddfd7804b85c711213cb8689e15013a3e9bda7ab73bafba15de47e",
+  "sd_installation": "User confirmed completed and working",
+  "previous_0_1_0_correction": {
+    "firmware_version": "0.1.0",
+    "web_capsule_sha256": "9bc222fef487ebca00744866f6506a7aa99db360c610ea875db0f91a18798487",
+    "kernel_rootfs_written_and_readback_verified": true,
+    "normal_nor_boot_without_saved_env_changes": true,
+    "boot_confirmed_sequence": 2,
+    "vlc_video_audio_advancing": true,
+    "ffmpeg_frames_in_8_seconds": 121,
+    "ffmpeg_decode_errors": [],
+    "sd_old_installer_renamed": "LINUX.OLD",
+    "new_sd_version_0_1_1_test_pending": true,
+    "known_limitation": "RTSP session creation initially waits for kernel entropy after reboot"
+  }
+}

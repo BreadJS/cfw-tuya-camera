@@ -1,0 +1,20 @@
+#!/bin/sh
+set -eu
+# Exact module order and parameters used by the verified MIS2006 camera.
+echo dev,GPIO61,0,0 > /proc/driver/pinctrl
+echo mux,GPIO61,GPIO61,0 > /proc/driver/pinctrl
+insmod /usr/modules/ssv6x5x.ko stacfgpath=/etc/ssv6x5x-wifi.cfg
+insmod /usr/modules/vmm.ko mmz=anonymous,0,0xA2400000,20M anony=1
+set_gpio() {
+    if [ ! -d "/sys/class/gpio/GPIO$1" ]; then
+        echo "$1" > /sys/class/gpio/export
+        echo out > "/sys/class/gpio/GPIO$1/direction"
+    fi
+    echo "$2" > "/sys/class/gpio/GPIO$1/value"
+}
+set_gpio 13 0
+insmod /usr/modules/rtvbus.ko ra=0xa3e00000 rs=65536 fn=/usr/modules/rtthread_arc_FH8626V100.bin fa=0xa3f00000
+set_gpio 13 1
+for module in media_process isp enc jpeg bgm vbus_ac; do
+    insmod "/usr/modules/$module.ko"
+done

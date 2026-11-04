@@ -1,0 +1,52 @@
+#!/bin/sh
+# No vendor startup script, cloud client, network shell or watchdog keeper.
+PATH=/bin:/sbin:/usr/bin:/usr/sbin
+export PATH
+umask 077
+mount -t proc proc /proc || exit 1
+mount -t sysfs sysfs /sys || exit 1
+mount -t ramfs ramfs /var || exit 1
+mkdir -p /var/run /var/nm /var/tmp /var/lib/misc
+mount -t tmpfs tmpfs /dev || exit 1
+mkdir -p /dev/pts
+mknod /dev/null c 1 3
+mknod /dev/console c 5 1
+chmod 666 /dev/null
+mount -t devpts devpts /dev/pts || exit 1
+mkdir -p /run/udev /dev/.udev
+/sbin/udevd --daemon || exit 1
+/sbin/udevadm trigger || exit 1
+/sbin/udevadm settle --timeout=10 || exit 1
+case " $(cat /proc/cmdline) " in
+    *" camera_sd_test=1 "*) ;;
+    *) echo 'RAM_TEST_REFUSED missing explicit trial boot argument'; exit 1 ;;
+esac
+mount -t tmpfs -o mode=700 tmpfs /etc/conf || exit 1
+# Remove NOR device nodes from this test userspace. Never erase or write them.
+rm -f /dev/mtd[0-9]* /dev/mtdblock[0-9]*
+echo 'RAM_TEST_CONFIG storage=tmpfs nor_mounted=no nor_device_nodes=removed' 
+mkdir -p /etc/conf/camera
+chmod 700 /etc/conf/camera
+if [ -f /usr/share/camera/trial-wifi.conf ]; then
+    cp /usr/share/camera/trial-wifi.conf /etc/conf/camera/wpa_supplicant.conf
+    chmod 600 /etc/conf/camera/wpa_supplicant.conf
+    rm /usr/share/camera/trial-wifi.conf
+fi
+for config in settings recovery credentials; do
+    if [ -f /usr/share/camera/trial-$config.conf ]; then
+        cp /usr/share/camera/trial-$config.conf /etc/conf/camera/$config.conf
+        chmod 600 /etc/conf/camera/$config.conf
+        rm /usr/share/camera/trial-$config.conf
+    fi
+done
+ifconfig lo 127.0.0.1 up
+# Use a coarse image-build epoch only when the RTC is invalid. This is not NTP.
+if [ "$(date -u +%Y)" -lt 2020 ]; then
+    date -u -s "$(cat /usr/share/camera/build-time-utc)" || exit 1
+    echo 'CAMERA_CLOCK source=image-build-floor accuracy=unsynchronized'
+fi
+/usr/libexec/camera/load-hardware || exit 1
+/sbin/udevadm settle --timeout=10 || exit 1
+/usr/libexec/camera/start-network || exit 1
+# start-service waits for this marker; failed hardware/network setup stays stopped.
+touch /var/run/camera-boot-ready

@@ -1,0 +1,253 @@
+#!/bin/sh
+# Single-radio station/AP state machine. Credentials are never sourced as code.
+set -u
+umask 077
+cd /
+export PATH=/tmp/camera-runtime:/bin:/sbin
+R=${CAMERA_NETWORK_RUNTIME:-/var/run/camera-network}
+C=${CAMERA_CONFIG_DIR:-/etc/config/camera}/wifi
+B=${CAMERA_RUNTIME_DIR:-/tmp/camera-runtime}
+mkdir -p "$R/wpa_ctrl" "$C"
+chmod 700 "$R" "$R/wpa_ctrl" "$C"
+printf '%s\n' "$$" >"$R/supervisor.pid"
+module_uncertain=0
+write() { printf '%s' "$2" >"$R/.$1.tmp" && mv "$R/.$1.tmp" "$R/$1"; }
+stop_pid() {
+    if [ -f "$R/$1.pid" ]; then
+        pid=$(cat "$R/$1.pid")
+        case "$pid" in ''|*[!0-9]*) :;; *) kill "$pid" 2>/dev/null || :;; esac
+        rm -f "$R/$1.pid"
+    fi
+}
+stop_network() { rm -f "$R/network-ready"; stop_pid dhcp; stop_pid hostapd; stop_pid udhcpd; stop_pid wpa; sleep 1; ifconfig wlan0 0.0.0.0 down; }
+# Diagnostic opt-in until observed on this exact board. The stock driver
+# script reloads this chain for every STA/AP transition. Never continue a
+# sequence after a failed/timed-out module operation, and never lazy-unload.
+module_operation() {
+    label=$1
+    shift
+    echo "NETWORK_MODULE start=$label" >>"$R/module.log"
+    "$@" >>"$R/module.log" 2>&1 &
+    operation_pid=$!
+    for poll in 1 2 3 4 5 6 7 8; do
+        if ! kill -0 "$operation_pid" 2>/dev/null; then
+            wait "$operation_pid"
+            operation_result=$?
+            echo "NETWORK_MODULE done=$label rc=$operation_result" >>"$R/module.log"
+            return "$operation_result"
+        fi
+        sleep 1
+    done
+    module_uncertain=1
+    kill -KILL "$operation_pid" 2>/dev/null || :
+    echo "NETWORK_MODULE timeout=$label pid=$operation_pid kernel_task_may_remain=yes" >>"$R/module.log"
+    return 1
+}
+reload_radio() {
+    [ "$module_uncertain" = 0 ] || return 1
+    [ "${CAMERA_NETWORK_RELOAD_DRIVER:-0}" = 1 ] || return 0
+    modules=${CAMERA_NETWORK_MODULE_DIR:-/usr/modules}
+    for module in rtl8188ftv ak_hcd usbcore usb-common cfg80211; do
+        proc_name=$module
+        [ "$module" != usb-common ] || proc_name=usb_common
+        if grep -q "^$proc_name " /proc/modules; then
+            module_operation "remove-$module" /bin/busybox rmmod "$module" || return 1
+        fi
+    done
+    for module in cfg80211 usb-common usbcore ak_hcd rtl8188ftv; do
+        module_operation "insert-$module" /bin/busybox insmod "$modules/$module.ko" || return 1
+    done
+    sleep 2
+}
+station() {
+    stop_network
+    reload_radio || { write mode error; write error 'Station radio reload failed; inspect module.log'; return 1; }
+    rm -f "$R/active.id"
+    if [ -s "$R/pending.id" ]; then
+        cp "$R/pending.conf" "$R/wpa.conf"
+        cp "$R/pending.id" "$R/active.id"
+    elif [ -s "$C/current.conf" ]; then cp "$C/current.conf" "$R/wpa.conf"
+    else
+        printf 'ctrl_interface=%s/wpa_ctrl\nupdate_config=0\n' "$R" >"$R/wpa.conf"
+    fi
+    ifconfig wlan0 up
+    "$B/wpa_supplicant" -Dnl80211,wext -iwlan0 -c"$R/wpa.conf" >>"$R/wpa.log" 2>&1 &
+    echo $! >"$R/wpa.pid"
+    write mode station
+    started=$(cut -d. -f1 /proc/uptime)
+    connected=0
+    scan_next=0
+    scan_ready=0
+}
+ap_status() {
+    "$B/hostapd_cli" -p "$R/hostapd_ctrl" -i wlan0 status >"$R/ap-status.tmp" 2>&1
+    status_rc=$?
+    {
+        printf 'AP_STATUS uptime=%s cli=%s rc=%s\n' "$(cut -d. -f1 /proc/uptime)" "$B/hostapd_cli" "$status_rc"
+        /bin/busybox ls -ld "$R/hostapd_ctrl" "$R/hostapd_ctrl/wlan0" 2>&1
+        cat "$R/ap-status.tmp"
+    } >>"$R/ap-readiness.log"
+    [ "$status_rc" = 0 ] && grep -q '^state=ENABLED' "$R/ap-status.tmp"
+}
+access_point() {
+    # Reuse the last station scan without taking a connected video stream off
+    # channel. Manual scans remain available through the HTTP WPA backend.
+    if [ -S "$R/wpa_ctrl/wlan0" ]; then
+        "$B/wpa_cli" -p "$R/wpa_ctrl" -i wlan0 scan_results >"$R/scan-cache.tmp" 2>/dev/null && mv "$R/scan-cache.tmp" "$R/scan-cache"
+    fi
+    stop_network
+    reload_radio || { write mode error; write error 'AP radio reload failed; inspect module.log'; return 1; }
+    address=$(cat /sys/class/net/wlan0/address 2>/dev/null)
+    last=${address##*:}; address=${address%:*}
+    middle=${address##*:}; address=${address%:*}
+    first=${address##*:}
+    mac=$first$middle$last
+    case "$mac" in *[!0-9a-fA-F]*|'') write error 'Invalid WLAN MAC'; return 1;; esac
+    case "$mac" in ??????) :;; *) write error 'No WLAN MAC; cannot select unique recovery SSID'; return 1;; esac
+    ssid=Camera-$mac
+    write ap.ssid "$ssid"
+    cat >"$R/hostapd.conf" <<EOF
+interface=wlan0
+driver=nl80211
+ctrl_interface=$R/hostapd_ctrl
+ssid=$ssid
+country_code=NL
+hw_mode=g
+channel=6
+wmm_enabled=1
+ieee80211n=1
+ht_capab=[SHORT-GI-20]
+auth_algs=1
+wpa=2
+wpa_passphrase=camera123
+wpa_key_mgmt=WPA-PSK
+rsn_pairwise=CCMP
+EOF
+    ifconfig wlan0 192.168.10.1 netmask 255.255.255.0 up
+    : >"$R/hostapd.log"
+    "$B/hostapd" "$R/hostapd.conf" >>"$R/hostapd.log" 2>&1 &
+    echo $! >"$R/hostapd.pid"
+    ready=0
+    for attempt in $(/bin/busybox seq 1 30); do
+        if ap_status; then ready=1; break; fi
+        sleep 1
+    done
+    if [ "$ready" != 1 ]; then write mode error; write error 'Recovery AP failed; inspect hostapd.log'; return 1; fi
+    cat >"$R/udhcpd.conf" <<EOF
+start 192.168.10.10
+end 192.168.10.50
+interface wlan0
+option subnet 255.255.255.0
+option router 192.168.10.1
+option lease 600
+lease_file $R/udhcpd.leases
+pidfile $R/udhcpd.pid
+EOF
+    udhcpd -f "$R/udhcpd.conf" >>"$R/dhcp.log" 2>&1 &
+    echo $! >"$R/udhcpd.pid"
+    sleep 1
+    if ! kill -0 "$(cat "$R/udhcpd.pid")" 2>/dev/null; then
+        write mode error; write error 'Recovery DHCP service failed'; return 1
+    fi
+    write mode ap
+    write error ''
+}
+# The application retries an interrupted reset before loading settings. Do not
+# read/associate with old credentials while that marker is still present.
+reset_marker=${CAMERA_CONFIG_DIR:-/etc/config/camera}/reset.pending
+for attempt in $(/bin/busybox seq 1 30); do
+    if [ ! -e "$reset_marker" ] && [ ! -L "$reset_marker" ]; then break; fi
+    write mode waiting-reset
+    sleep 1
+done
+if [ -e "$reset_marker" ] || [ -L "$reset_marker" ]; then
+    write mode error
+    write error 'Pending settings reset did not complete; network startup refused'
+    exit 1
+fi
+mode=station
+started=0
+connected=0
+station
+while :; do
+    # Update quiesce leaves current WPA/DHCP processes connected and stops new
+    # transitions. Their executables are already RAM resident.
+    if [ -f "$R/quiesced" ]; then
+        current_boot=$(cat /proc/sys/kernel/random/boot_id)
+        pause_boot=$(cat "$R/quiesced")
+        if [ "$pause_boot" = "$current_boot" ] && [ -n "$current_boot" ] && [ "$module_uncertain" = 0 ]; then
+            printf '%s\n' "$current_boot" >"$R/quiesced.ack.tmp"
+            mv "$R/quiesced.ack.tmp" "$R/quiesced.ack"
+            sleep 1
+            continue
+        fi
+    fi
+    rm -f "$R/quiesced.ack"
+    now=$(cut -d. -f1 /proc/uptime)
+    if [ -s "$R/pending.id" ] && [ -f "$R/pending.expires" ]; then
+        expiry=$(cat "$R/pending.expires")
+        case "$expiry" in ''|*[!0-9]*) expiry=0;; esac
+        if [ "$now" -ge "$expiry" ]; then rm -f "$R/pending.id"; write request apply; fi
+    fi
+    if [ -f "$R/request" ]; then
+        mv "$R/request" "$R/request.running" || continue
+        requested=$(cat "$R/request.running")
+        rm -f "$R/request.running"
+        if [ "$requested" = recovery ]; then access_point || station; else station; fi
+    fi
+    mode=$(cat "$R/mode" 2>/dev/null)
+    if [ "$mode" = station ]; then
+        if [ "$connected" = 0 ] && [ "$now" -ge "$scan_next" ]; then
+            if "$B/wpa_cli" -p "$R/wpa_ctrl" -i wlan0 scan 2>/dev/null | grep -q '^OK'; then
+                scan_next=$((now+30))
+                scan_ready=$((now+5))
+            else
+                scan_next=$((now+2))
+            fi
+        fi
+        if [ "$scan_ready" -gt 0 ] && [ "$now" -ge "$scan_ready" ]; then
+            "$B/wpa_cli" -p "$R/wpa_ctrl" -i wlan0 scan_results >"$R/scan-cache.tmp" 2>/dev/null && mv "$R/scan-cache.tmp" "$R/scan-cache"
+            scan_ready=0
+        fi
+        if "$B/wpa_cli" -p "$R/wpa_ctrl" -i wlan0 status 2>/dev/null | grep -q '^wpa_state=COMPLETED'; then
+            if [ "$connected" = 0 ]; then
+                udhcpc -f -i wlan0 -s "$B/dhcp-event" >>"$R/dhcp.log" 2>&1 &
+                echo $! >"$R/dhcp.pid"
+            fi
+            connected=1
+            started=$now
+        else
+            [ "$connected" = 0 ] || stop_pid dhcp
+            connected=0
+            rm -f "$R/network-ready"
+            # Failed candidate remains available for confirmation/rollback only
+            # until its 90-second deadline; recovery preserves pending metadata.
+            delay=45
+            if [ ! -s "$C/current.conf" ] && [ ! -s "$R/pending.id" ]; then delay=12; fi
+            if [ $((now-started)) -ge "$delay" ] && [ ! -f "$C/recovery-disabled" ]; then access_point || station; fi
+        fi
+    elif [ "$mode" = ap ]; then
+        if kill -0 "$(cat "$R/udhcpd.pid" 2>/dev/null)" 2>/dev/null && ap_status; then
+            write network-ready 1
+        else
+            rm -f "$R/network-ready"
+            write error 'Recovery AP lost radio state'
+        fi
+        # A user can disable fallback while connected to its AP. This requests
+        # station mode immediately; no automatic periodic AP drop occurs.
+        if [ -f "$C/recovery-disabled" ]; then station; fi
+    fi
+    # Writers use append mode. Truncate in place after retaining a small tail;
+    # renaming an open log would leave an unlinked, growing RAM inode.
+    for logfile in wpa.log hostapd.log dhcp.log module.log ap-readiness.log; do
+        if [ -f "$R/$logfile" ]; then
+            logbytes=$(/bin/busybox wc -c <"$R/$logfile")
+            if [ "$logbytes" -gt 65536 ]; then
+                /bin/busybox tail -c 32768 "$R/$logfile" >"$R/log-tail.tmp"
+                cat "$R/log-tail.tmp" >"$R/$logfile"
+                rm -f "$R/log-tail.tmp"
+            fi
+        fi
+    done
+    sleep 1
+done

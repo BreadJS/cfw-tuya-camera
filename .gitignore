@@ -1,0 +1,13 @@
+/local/
+/output/
+__pycache__/
+*.pyc
+*.pem
+*.key
+*.bin
+*.cap
+*.ko
+*.so
+*.a
+*.o
+*.uImage
