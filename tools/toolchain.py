@@ -1,28 +1,20 @@
 #!/usr/bin/env python3
-"""Fetch a pinned cross compiler into the local cache; verify before extracting."""
+"""Install a bundled cross compiler offline; verify before extracting."""
 import argparse
 import hashlib
 import json
 from pathlib import Path
-import shutil
 import tarfile
 import tempfile
-import urllib.request
 from profiles import ROOT,ProfileError,load
 
 def install(profile,cache):
     pin=profile['soc']['toolchain'];name=profile['soc']['id'];destination=cache/name
-    archive=cache/(pin['sha256']+'.tar');cache.mkdir(parents=True,exist_ok=True)
-    if not archive.exists():
-        with tempfile.NamedTemporaryFile(dir=cache,delete=False) as stream:
-            temporary=Path(stream.name)
-            try:
-                with urllib.request.urlopen(pin['url'],timeout=60) as response:shutil.copyfileobj(response,stream)
-            except BaseException:temporary.unlink(missing_ok=True);raise
-        if temporary.stat().st_size!=pin['bytes'] or hashlib.sha256(temporary.read_bytes()).hexdigest()!=pin['sha256']:
-            temporary.unlink();raise ProfileError('Toolchain download does not match its pinned size/hash')
-        temporary.rename(archive)
-    if archive.stat().st_size!=pin['bytes'] or hashlib.sha256(archive.read_bytes()).hexdigest()!=pin['sha256']:raise ProfileError('Cached toolchain archive differs from pin')
+    archive=(ROOT/pin['archive']).resolve()
+    if not archive.is_relative_to((ROOT/'toolchains').resolve()):raise ProfileError('Toolchain archive must be inside the repository toolchains directory')
+    if not archive.is_file():raise ProfileError('Bundled toolchain archive is missing: '+str(archive))
+    if archive.stat().st_size!=pin['bytes'] or hashlib.sha256(archive.read_bytes()).hexdigest()!=pin['sha256']:raise ProfileError('Bundled toolchain archive differs from pin')
+    cache.mkdir(parents=True,exist_ok=True)
     receipt=destination/'verified.json'
     if destination.exists():
         if not receipt.is_file() or json.loads(receipt.read_text()).get('archive_sha256')!=pin['sha256']:raise ProfileError('Existing toolchain lacks a matching completion receipt; move it aside first')

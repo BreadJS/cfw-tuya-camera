@@ -62,7 +62,9 @@ Restored/pinned Fullhan musl and Anyka uClibc toolchains both cross-build. A fre
 source ZIP in a separate directory builds both targets with explicitly imported
 local inputs and no earlier project source. Fresh Anyka AP tools also build.
 Host regressions and source/export/qualification tests pass. Private inputs,
-original firmware, toolchains and keys are excluded from the public export.
+original firmware and keys are excluded from the public export. Pinned toolchain
+archives are now bundled in `toolchains/` and installed offline, including from
+the public export.
 
 See VALIDATION.md for actual build/test evidence and remaining hardware limits.
 No new firmware was flashed. The new source composition is version 0.2.0; final

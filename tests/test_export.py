@@ -14,5 +14,5 @@ class Export(unittest.TestCase):
   for path in exported:
    self.assertNotIn(path.split('/')[0],{'local','output','investigation','research'})
    self.assertFalse(path.endswith(('.pem','.key','.bin','.ko','.so')))
-  for file in ('README.md','LICENSE','compile-web.sh','compile-sd.sh','.github/workflows/test.yml'):self.assertIn(file,exported)
+  for file in ('README.md','LICENSE','compile-web.sh','compile-sd.sh','.github/workflows/pages.yml','tools/build_site.py','tests/test_site.py','site/metadata.json','site/assets/app.js','site/assets/style.css'):self.assertIn(file,exported)
 if __name__=='__main__':unittest.main()

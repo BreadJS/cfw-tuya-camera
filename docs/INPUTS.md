@@ -1,8 +1,10 @@
 # Local inputs and licensing
 
 The source export intentionally contains no vendor firmware, SDK host, kernel,
-kernel modules, cross compiler or private keys. These remain in ignored `local/`
-or the user's external cache. Builds reject unknown original-image revisions.
+kernel modules or private keys. These remain in ignored `local/`.
+The pinned cross compiler archives are included in `toolchains/`, installed
+offline into the user's cache, and included in source exports.
+Builds reject unknown original-image revisions.
 Matching the marketing name or CPU alone is insufficient.
 
 For an existing prepared project, `tools/import_local.py` copies its `base/` and
@@ -66,7 +68,7 @@ BSD-2-Clause/CC0 notices in source; the reference project's MIT notice is in
 `docs/third-party/ANYKA-ABI.md`. Third-party copyright/license notices remain
 intact and are not replaced by the project license.
 
-Linux, BusyBox, WPA/AP utilities and the external toolchain have their own
+Linux, BusyBox, WPA/AP utilities and the bundled toolchains have their own
 licenses and source/redistribution obligations. The Anyka SDK host and vendor
 modules may have additional restrictions. Owning an input image is not blanket
 permission to redistribute its proprietary components. The source ZIP excludes

@@ -8,6 +8,7 @@ on:
       - 'site/**'
       - 'tools/build_site.py'
       - 'tools/profiles.py'
+      - 'tests/test_site.py'
       - 'README.md'
       - 'docs/**'
       - 'project.json'

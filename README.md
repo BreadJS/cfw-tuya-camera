@@ -32,7 +32,10 @@ python3 -m pip install -r requirements.txt
 
 Activate `.venv` again when opening a new terminal.
 
-Download the compiler for your camera, or both for SD batch builds:
+Install the bundled compiler for your camera, or both for SD batch builds.
+Both pinned toolchain archives are included in `toolchains/`; installation
+verifies their size and SHA-256 and extracts them into a local cache. It works
+offline and never downloads a toolchain from GitHub or another server.
 
 ```sh
 python3 tools/toolchain.py --board lsc-smart-indoor

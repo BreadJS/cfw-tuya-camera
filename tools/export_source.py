@@ -7,7 +7,7 @@ import zipfile
 from profiles import ROOT
 
 ROOT_FILES={'README.md','LICENSE','Makefile','requirements.txt','.gitignore','compile-web.sh','compile-sd.sh','project.json'}
-ROOT_DIRS={'boards','soc','shared','platforms','tools','tests','docs','.github'}
+ROOT_DIRS={'boards','soc','shared','platforms','tools','tests','docs','.github','toolchains','site'}
 EXCLUDED={'__pycache__','.git','build','node_modules'}
 
 def source_files(root=ROOT):

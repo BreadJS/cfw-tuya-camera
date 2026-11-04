@@ -17,12 +17,12 @@
   "toolchain": {
     "repo": "https://github.com/medevil84/ipcd",
     "commit": "7b77c193c631b1e77c3d00459441e8d14b0d88d3",
-    "url": "https://raw.githubusercontent.com/medevil84/ipcd/7b77c193c631b1e77c3d00459441e8d14b0d88d3/src/x-tools.tar.bz2",
     "bytes": 46300143,
     "sha256": "a49310e4fd15c9df25a4feedf17d770e187dac4e45e3edc9c8f9c8cb8e4b0970",
     "compiler_relative": "x-tools/arm-unknown-linux-uclibcgnueabi/bin/arm-unknown-linux-uclibcgnueabi-gcc",
     "compiler_version": "5.5.0",
     "libc": "uClibc1.0.28",
-    "target": "ARMv5TE soft-float EABI5"
+    "target": "ARMv5TE soft-float EABI5",
+    "archive": "toolchains/x-tools.tar.bz2"
   }
 }

@@ -15,10 +15,10 @@
     "mis2006"
   ],
   "toolchain": {
-    "url": "https://github.com/OpenIPC/firmware/releases/download/toolchain/toolchain.hisilicon-hi3516cv100.tgz",
     "bytes": 102606142,
     "sha256": "466683e215a493144ba87b3d57a733864b6db318aad847bf0fd0616dda39729e",
     "compiler_relative": "arm-openipc-linux-musleabi_sdk-buildroot/bin/arm-openipc-linux-musleabi-gcc",
-    "archive_type": "tar.gz"
+    "archive_type": "tar.gz",
+    "archive": "toolchains/toolchain.hisilicon-hi3516cv100.tgz"
   }
 }
