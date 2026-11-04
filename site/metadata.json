@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "cameras": {
+    "lsc-smart-indoor": {
+      "summary": "Fixed-view indoor camera with a native Fullhan video backend and manual infrared controls.",
+      "identification": "Check the chip marking FH8626V100 and the MIS2006 sensor revision. The product name or enclosure alone is not enough to choose firmware.",
+      "backend_note": "Own native media backend. The Tuya application is excluded from the built runtime. Original kernel, hardware modules and selected runtime libraries are retained.",
+      "image": "assets/images/LSC-Smart-Indoor-IP-Camera.webp",
+      "image_alt": "LSC Smart Connect Smart Indoor IP Camera retail packaging, showing the fixed camera and 1080p HD label"
+    },
+    "lsc-smart-rotatable": {
+      "summary": "Motorised indoor camera with pan and tilt, touch-and-hold control, audio and infrared night vision.",
+      "identification": "The verified chip is marked ANYKA AK3918EN080 V300S. This profile uses the AK39EV330 backend with the MIS2006 sensor. Other revisions need their own investigation.",
+      "backend_note": "Interim SDK-host backend: original application main is blocked, but proprietary vendor SDK code remains for media support. The updater replaces APP only.",
+      "image": "assets/images/LSC-Smart-Rotatable-Camera.jpg",
+      "image_alt": "LSC Smart Connect Smart Rotatable Camera retail packaging, showing the pan-and-tilt camera and 1080p HD label"
+    }
+  }
+}
