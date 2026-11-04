@@ -2,6 +2,9 @@
 
 Custom firmware for two LSC cameras, built from one project. Version **0.2.0**.
 
+Browse the [camera catalogue](https://breadjs.github.io/cfw-tuya-camera/) to see
+supported cameras, photos, hardware details and build configurations.
+
 | Camera | Config |
 | --- | --- |
 | LSC Smart Indoor IP Camera — Fullhan FH8626V100 | `lsc-smart-indoor` |
